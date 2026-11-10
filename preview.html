@@ -196,7 +196,7 @@ function layout() {
   tilt.rotation.y = sv;
   cta.style.top = Math.min(h - 70, maxY + 18) + 'px';
 }
-function applyCam() { cam.position.copy(C.pos); cam.fov = C.fov; cam.updateProjectionMatrix(); cam.lookAt(C.look); }
+function applyCam() { cam.position.copy(C.pos); cam.fov = C.fov; cam.updateProjectionMatrix(); cam.lookAt(C.look); cam.updateMatrixWorld(); }
 
 /* ---------- motion helpers ---------- */
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), seg = (t, a, b) => clamp((t - a) / (b - a));
