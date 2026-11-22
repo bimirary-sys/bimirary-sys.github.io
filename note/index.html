@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>복복이의 건강수첩</title>
+<meta name="description" content="건강 고민별, 복복이의 생활 꿀팁을 쏙쏙. 영상 속 제품을 모아 둔 복복이의 건강수첩이에요.">
+<meta property="og:title" content="복복이의 건강수첩 📒">
+<meta property="og:description" content="건강 고민별, 복복이의 생활 꿀팁을 쏙쏙">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bimirary-sys.github.io/note/">
+<meta name="theme-color" content="#cfeadd">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+:root{--mint:#bfe6d3;--mint2:#d8f1e6;--cream:#fff8ec;--coral:#ff8a7a;--ink:#4a3a44;--sub:#8a7a84;--line:#d6ece2}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--mint2);color:var(--ink);font-family:"Gowun Dodum",system-ui,sans-serif}
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 80% at 50% 35%,#e9f8f1 0%,#cfeadd 60%,#bfe2d2 100%);z-index:5}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#openBtn{position:absolute;left:50%;bottom:calc(9vh + env(safe-area-inset-bottom));transform:translateX(-50%);border:0;cursor:pointer;
+ font-family:Jua,sans-serif;font-size:22px;color:#fff;background:var(--coral);padding:16px 30px;border-radius:999px;box-shadow:0 8px 0 #e46f60,0 14px 24px rgba(80,60,60,.18);
+ animation:bob 1.4s ease-in-out infinite;white-space:nowrap}
+#openBtn:active{transform:translateX(-50%) translateY(4px);box-shadow:0 4px 0 #e46f60}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -7px}}
+#flash{position:absolute;inset:0;background:var(--cream);opacity:0;pointer-events:none}
+#intro.gone{opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+/* ---------- note page ---------- */
+#note{min-height:100vh;opacity:0;transition:opacity .4s}
+#note.show{opacity:1}
+.disc{position:sticky;top:0;z-index:3;background:#fff1c7;color:#6a5236;font-size:13px;line-height:1.5;text-align:center;padding:9px 14px;border-bottom:1px solid #f2dc9e}
+.paper{max-width:560px;margin:0 auto;min-height:100vh;background:
+ linear-gradient(90deg,transparent 46px,#ffc2b8 46px,#ffc2b8 48px,transparent 48px),
+ repeating-linear-gradient(transparent 0 35px,var(--line) 35px 36px),var(--cream);
+ padding:26px 18px 40px 64px;position:relative;box-shadow:0 0 40px rgba(60,90,80,.12)}
+.paper:before{content:"";position:absolute;left:14px;top:20px;bottom:20px;width:18px;background:radial-gradient(circle at 9px 9px,#cfe6dc 7px,transparent 8px) 0 0/18px 54px repeat-y}
+h1{font-family:Jua,sans-serif;font-weight:400;font-size:34px;margin:6px 0 2px;color:#e0705f}
+.sub{color:var(--sub);font-size:15px;margin:0 0 22px}
+.ep{margin:26px 0 8px}
+.ep h2{font-family:Jua,sans-serif;font-weight:400;font-size:21px;margin:0 0 8px;display:inline-block;background:linear-gradient(transparent 55%,#c8efd9 55%)}
+.memo{font-size:15px;line-height:1.75;margin:0 0 6px;padding:10px 12px;border-radius:12px;background:#fffdf6;border:1.5px dashed #f0c9b8}
+.memo mark{background:linear-gradient(transparent 50%,#fff08a 50%);color:inherit}
+.src{font-size:12px;color:var(--sub);margin:4px 2px 10px}
+.item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px 12px;margin:10px 0;box-shadow:0 2px 0 #f0e6dc,0 6px 14px rgba(120,90,80,.06);scroll-margin-top:60px}
+.item:target{outline:3px solid #ffb3a7}
+.no{flex:none;width:34px;height:34px;border-radius:50%;background:var(--mint);color:#2f6a55;font-family:Jua,sans-serif;font-size:18px;display:grid;place-items:center}
+.txt{flex:1;min-width:0}.txt b{display:block;font-size:16px;margin-bottom:2px}.txt span{font-size:13px;color:var(--sub)}
+.go{flex:none;text-decoration:none;font-family:Jua,sans-serif;font-size:14px;color:#fff;background:var(--coral);padding:9px 12px;border-radius:12px;white-space:nowrap}
+.empty{text-align:center;padding:38px 10px;font-size:16px;color:var(--sub);background:#fffdf6;border-radius:16px;border:1.5px dashed #cfe6dc;margin-top:20px}
+.empty b{display:block;font-family:Jua,sans-serif;font-weight:400;font-size:22px;color:var(--ink);margin-bottom:6px}
+.foot{margin-top:34px;font-size:12.5px;line-height:1.7;color:var(--sub)}
+.foot p{margin:6px 0}
+.btns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btns a,.btns button{font-family:Jua,sans-serif;font-size:15px;border:0;cursor:pointer;text-decoration:none;padding:10px 16px;border-radius:12px;background:#e3f3ec;color:#2f6a55}
+@media (prefers-reduced-motion:reduce){#openBtn{animation:none}}
+</style>
+</head>
+<body>
+<div id="intro"><canvas id="cv"></canvas><div id="flash"></div><button id="openBtn" aria-label="복복이 건강수첩 열기">복복이 건강수첩 보기 ▲</button></div>
+
+<div id="note" aria-hidden="true">
+  <div class="disc">이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</div>
+  <div class="paper">
+    <h1>복복이의 건강수첩</h1>
+    <p class="sub">건강 고민별, 복복이의 생활 꿀팁을 쏙쏙</p>
+    <div id="list"></div>
+    <div class="foot">
+      <p>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+      <p>개인차가 있을 수 있어요. 복용 중인 약이 있거나 질환이 있다면 약사·의사와 상담하세요.</p>
+      <div class="btns"><button id="closeBtn">← 수첩 덮기</button><a href="https://bimirary-sys.github.io/">🧸 복복이 장난감 상자</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 수첩 내용: 새 링크는 여기에만 추가하면 돼요 ============
+   { ep: '건강툰 1화', title: '주제', memo: '오늘의 건강 메모 (<mark>강조</mark> 가능)', src: '출처',
+     items: [ { no: 1, name: '제품명', desc: '한 줄 설명', url: '쿠팡 파트너스 링크' } ] }          */
+const NOTES = [
+];
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function buildList() { const L = $('list');
+  if (!NOTES.length) { L.innerHTML = '<div class="empty"><b>첫 번째 수첩이 곧 열려요 📒</b>영상에 나온 제품이 여기에 차곡차곡 모일 거예요.</div>'; return; }
+  L.innerHTML = NOTES.map(n => '<section class="ep"><h2>' + esc(n.ep) + (n.title ? ' · ' + esc(n.title) : '') + '</h2>' + (n.memo ? '<div class="memo">📝 ' + n.memo + '</div>' : '') + (n.src ? '<div class="src">출처: ' + esc(n.src) + '</div>' : '') +
+    (n.items || []).map(it => '<div class="item" id="' + esc(it.no) + '"><div class="no">' + esc(it.no) + '</div><div class="txt"><b>' + esc(it.name) + '</b><span>' + esc(it.desc) + '</span></div><a class="go" href="' + esc(it.url) + '" target="_blank" rel="sponsored noopener">쿠팡에서 보기 →</a></div>').join('') + '</section>').join(''); }
+buildList();
+function showNote(instant) { const I = $('intro'), N = $('note'); I.classList.add('gone'); N.setAttribute('aria-hidden', 'false'); requestAnimationFrame(() => N.classList.add('show')); document.body.style.overflow = ''; running = false;
+  const h = decodeURIComponent(location.hash.slice(1)); if (h && h !== '목록' && h !== 'list') { const el = document.getElementById(h); if (el) setTimeout(() => el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'center' }), 120); } }
+$('closeBtn').onclick = () => { const N = $('note'); N.classList.remove('show'); N.setAttribute('aria-hidden', 'true'); setTimeout(() => { window.scrollTo(0, 0); reset(); $('intro').classList.remove('gone'); running = true; loop(); }, 300); };
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const direct = !!location.hash;
+let seen = false; try { seen = localStorage.getItem('bokbok_note_seen') === '1'; } catch (e) {}
+if (direct || reduce || !window.THREE) { showNote(true); if (!window.THREE) return; }
+/* ---------- sounds (very quiet) ---------- */
+let ac = null; const au = () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} };
+function blip(f, d, type, v, f2) { if (!ac) return; const o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, ac.currentTime); if (f2) o.frequency.exponentialRampToValueAtTime(f2, ac.currentTime + d); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + d); }
+function noise(d, v, lo, hi) { if (!ac) return; const n = ac.sampleRate * d, b = ac.createBuffer(1, n, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / n); const s = ac.createBufferSource(); s.buffer = b; const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(lo, ac.currentTime); f.frequency.exponentialRampToValueAtTime(hi, ac.currentTime + d); const g = ac.createGain(); g.gain.value = v; s.connect(f).connect(g).connect(ac.destination); s.start(); }
+/* ---------- 3D notebook ---------- */
+const T = THREE, cv = $('cv');
+const R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); R.setPixelRatio(Math.min(2, devicePixelRatio)); R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = .92;
+const S = new T.Scene(); S.add(new T.HemisphereLight(0xffffff, 0xcfe6dc, .6)); const key = new T.DirectionalLight(0xfff4ea, 1.0); key.position.set(-3, 5, 6); S.add(key); const rim = new T.DirectionalLight(0xe0fff2, .35); rim.position.set(4, -2, 3); S.add(rim);
+const cam = new T.PerspectiveCamera(32, 1, .05, 100);
+const L = c => new T.Color(c).convertSRGBToLinear();
+const mat = (c, o) => new T.MeshPhysicalMaterial(Object.assign({ color: L(c), roughness: .55, clearcoat: .35, clearcoatRoughness: .4 }, o || {}));
+const tex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8; return t; };
+function rslab(w, h, d, r) { const s = new T.Shape(), x = -w / 2, y = -h / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h); s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); const g = new T.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 3, curveSegments: 8 }); g.translate(0, 0, -d / 2); return g; }
+const BW = 1.6, BH = 2.2;
+const book = new T.Group(); S.add(book);
+const coverM = mat('#ffe6c4'), edgeM = mat('#fffaf0', { roughness: .9, clearcoat: 0 });
+const back = new T.Mesh(rslab(BW, BH, .05, .1), coverM); back.position.z = -.14; book.add(back);
+const pageTex = tex(512, 704, (g, w, h) => { g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d6ece2'; g.lineWidth = 3; for (let y = 90; y < h - 30; y += 42) { g.beginPath(); g.moveTo(30, y); g.lineTo(w - 30, y); g.stroke(); } g.fillStyle = '#ffc2b8'; g.fillRect(56, 0, 3, h);
+  const ic = (k, x, y, c) => { g.fillStyle = c; g.beginPath(); if (k === 'h') { g.moveTo(x, y + 22); g.bezierCurveTo(x - 40, y - 4, x - 18, y - 32, x, y - 12); g.bezierCurveTo(x + 18, y - 32, x + 40, y - 4, x, y + 22); } else if (k === 'a') { g.arc(x, y, 22, 0, 7); } else { g.ellipse(x, y, 30, 13, -.6, 0, 7); } g.fill(); };
+  ic('a', 140, 190, '#ff8a8a'); ic('p', 330, 270, '#ffb47a'); ic('h', 170, 420, '#ff9fbd'); ic('a', 360, 520, '#9fd8a8'); g.fillStyle = 'rgba(255,236,120,.6)'; g.fillRect(220, 176, 200, 24); g.fillRect(100, 300, 160, 24); g.fillRect(240, 410, 190, 24); g.fillRect(110, 600, 250, 24); });
+const pages = new T.Mesh(new T.BoxGeometry(BW - .1, BH - .1, .2), [edgeM, edgeM, edgeM, edgeM, new T.MeshStandardMaterial({ map: pageTex, roughness: .9 }), edgeM]); pages.position.z = -.02; book.add(pages);
+const pivot = new T.Group(); pivot.position.set(-BW / 2, 0, .1); book.add(pivot);
+const front = new T.Mesh(rslab(BW, BH, .05, .1), coverM); front.position.x = BW / 2; pivot.add(front);
+const insideCover = new T.Mesh(new T.PlaneGeometry(BW - .16, BH - .16), new T.MeshStandardMaterial({ color: L('#cfe9dd'), roughness: .9 })); insideCover.position.set(BW / 2, 0, -.03); insideCover.rotation.y = Math.PI; pivot.add(insideCover);
+// subtle embossed corner stitch on the cover (no text)
+const stitch = new T.Mesh(new T.TorusGeometry(.18, .012, 6, 40), mat('#ffc2b8')); stitch.position.set(BW / 2 + .45, .72, .035); pivot.add(stitch);
+const spine = new T.Mesh(new T.CylinderGeometry(.14, .14, BH, 24, 1, false, Math.PI, Math.PI), mat('#ffe9cf')); spine.position.set(-BW / 2, 0, -.02); book.add(spine);
+const band = new T.Group(); book.add(band); const bandM = mat('#ff8a7a', { roughness: .4 }); const bandMesh = new T.Mesh(new T.BoxGeometry(.11, BH + .04, .03), bandM); bandMesh.position.set(BW / 2 - .28, 0, .14); band.add(bandMesh); const bandBack = new T.Mesh(new T.BoxGeometry(.11, BH + .04, .03), bandM); bandBack.position.set(BW / 2 - .28, 0, -.18); band.add(bandBack);
+// floating sparkles
+const spark = []; const sg = new T.OctahedronGeometry(.05, 0); for (let i = 0; i < 26; i++) { const m = new T.Mesh(sg, new T.MeshBasicMaterial({ color: L(['#ffffff', '#fff3a0', '#ffd0dc', '#d6f5ff'][i % 4]), transparent: true, opacity: .85 })); m.position.set((Math.random() - .5) * 7, (Math.random() - .5) * 9, -1.5 - Math.random() * 3); m.userData.p = Math.random() * 6; S.add(m); spark.push(m); }
+function size() { const w = innerWidth, h = innerHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+addEventListener('resize', size); size();
+const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x), easeIn = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * x;
+let running = !direct && !reduce, opening = -1, speed = 1, t0 = performance.now();
+function baseCam() { return Math.max(6.4, 7.4 * (.62 / Math.min(cam.aspect, .62))); }
+function reset() { $('openBtn').style.visibility = ''; opening = -1; pivot.rotation.y = 0; band.position.set(0, 0, 0); band.rotation.set(0, 0, 0); band.visible = true; $('flash').style.opacity = 0; }
+function frame(now) { const t = (now - t0) / 1000;
+  for (const m of spark) { m.position.y += .004; if (m.position.y > 4.5) m.position.y = -4.5; m.rotation.y += .02; m.material.opacity = .45 + .4 * Math.sin(t * 2 + m.userData.p); }
+  const D = baseCam();
+  if (opening < 0) { book.position.set(0, .25 + Math.sin(t * 1.3) * .12, 0); book.rotation.set(Math.sin(t * .9) * .08 - .05, Math.sin(t * .6) * .32, Math.sin(t * .8) * .06); cam.fov = 32; cam.updateProjectionMatrix(); cam.position.set(0, 0, D); cam.lookAt(0, .1, 0); }
+  else { const k = (now - opening) / 1000 * speed;
+    book.rotation.x *= .85; book.rotation.y *= .85; book.rotation.z *= .85; book.position.y += (0 - book.position.y) * .15;
+    const kb = ease(k / .15); band.position.set(kb * 1.2, kb * .4, kb * .6); band.rotation.z = -kb * .9; band.visible = kb < 1;
+    const kc = ease((k - .15) / .4); pivot.rotation.y = -kc * Math.PI * .96;
+    const kz = easeIn((k - .5) / .55); const tx = .35; cam.position.set(tx * kz, .0, D - (D - .25) * kz); cam.lookAt(tx * kz, 0, -.2); cam.fov = 32 - 10 * kz; cam.updateProjectionMatrix();
+    $('flash').style.opacity = Math.max(0, Math.min(1, (k - .8) / .25));
+    if (k >= 1.08) { try { localStorage.setItem('bokbok_note_seen', '1'); } catch (e) {} showNote(false); return false; } }
+  R.render(S, cam); return true; }
+function loop() { if (!running) return; if (frame(performance.now()) !== false) requestAnimationFrame(loop); }
+function open() { if (opening >= 0) return; au(); $('openBtn').style.visibility = 'hidden'; speed = seen ? 2.6 : 1; opening = performance.now(); blip(900, .08, 'triangle', .05, 600); setTimeout(() => noise(.25, .12, 2500, 6000), 150 / speed); setTimeout(() => noise(.45, .1, 400, 3000), 520 / speed); }
+$('openBtn').onclick = open; cv.addEventListener('pointerdown', open);
+if (running) loop();
+})();
+</script>
+</body>
+</html>
