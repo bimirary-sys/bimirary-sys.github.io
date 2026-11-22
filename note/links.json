@@ -1,8 +1,30 @@
 {
   "version": 1,
   "blocks": [
-    { "id": "t1", "type": "text", "text": "더 둘러보기", "on": true },
-    { "id": "l1", "type": "link", "title": "복복이 장난감 상자", "desc": "복복이의 다른 놀잇감 모음", "url": "https://bimirary-sys.github.io/", "on": true }
+    {
+      "id": "t1",
+      "type": "text",
+      "text": "더 둘러보기",
+      "on": true
+    },
+    {
+      "id": "l1",
+      "type": "link",
+      "title": "복복이 장난감 상자",
+      "desc": "복복이의 다른 놀잇감 모음",
+      "url": "https://bimirary-sys.github.io/",
+      "on": true
+    },
+    {
+      "id": "mws6x3mkc4v4",
+      "type": "link",
+      "no": "1",
+      "title": "ㄱㄹ",
+      "desc": "ㄹㄹ",
+      "url": "https://www.naver.com/",
+      "on": true
+    }
   ],
-  "archive": []
+  "archive": [],
+  "updated": "2026-11-22T18:49:08.038Z"
 }
