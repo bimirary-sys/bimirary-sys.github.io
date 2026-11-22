@@ -85,6 +85,10 @@ header{position:sticky;top:0;z-index:5;background:rgba(255,248,217,.94);backdrop
 .savebar .in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px}
 .savebar .msg{flex:1;font-size:13px;color:var(--sub)}
 .savebar .msg b{color:var(--ink);font-family:Jua,sans-serif;font-weight:400}
+.savebar .msg{font:15px/1.4 Jua,sans-serif;color:var(--mintInk)}
+.savebar .msg.busy{color:var(--sub)}
+.savebar .msg.bad{color:var(--redInk)}
+.savebar .msg small{display:block;font:12px "Gowun Dodum",sans-serif;color:var(--sub)}
 /* sheets */
 .dim{position:fixed;inset:0;z-index:10;background:rgba(74,58,68,.35);opacity:0;pointer-events:none;transition:opacity .2s}
 .dim.on{opacity:1;pointer-events:auto}
@@ -161,7 +165,7 @@ header{position:sticky;top:0;z-index:5;background:rgba(255,248,217,.94);backdrop
   </main>
   <button class="pv" id="pvBtn" type="button">미리보기</button>
   <button class="fab" id="addBtn" type="button" aria-label="블록 추가">+</button>
-  <div class="savebar"><div class="in"><div class="msg" id="saveMsg">바뀐 내용이 없어요</div><button class="btn pri" id="saveBtn" type="button" disabled>저장하기</button></div></div>
+  <div class="savebar"><div class="in"><div class="msg" id="saveMsg">✓ 수첩과 같아요</div><button class="btn pri" id="saveBtn" type="button" hidden>다시 저장</button></div></div>
 </div>
 
 <div class="dim" id="dim"></div>
@@ -249,13 +253,24 @@ const pending = new Map(); // block id -> { blob, url, ext }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const hasNo = b => b.no != null && String(b.no).trim() !== '';
 const nextNo = () => 1 + Math.max(0, ...state.blocks.concat(state.archive).filter(hasNo).map(b => parseInt(b.no, 10) || 0));
-const imgSrc = b => pending.has(b.id) ? pending.get(b.id).url : b.img ? (/^(https?:|data:)/.test(b.img) ? b.img : '../' + b.img) : '';
-function touch() { dirty++; $('saveBtn').disabled = false; $('saveMsg').innerHTML = '<b>저장 안 한 변경</b>이 있어요'; }
+const RAW = 'https://raw.githubusercontent.com/' + OWNER + '/' + REPO + '/' + BRANCH + '/note/';
+const imgSrc = b => pending.has(b.id) ? pending.get(b.id).url : b.img ? (/^(https?:|data:)/.test(b.img) ? b.img : RAW + b.img) : '';
+const DRAFT = 'bb_admin_draft';
+function setMsg(cls, html) { const m = $('saveMsg'); m.className = 'msg' + (cls ? ' ' + cls : ''); m.innerHTML = html; }
+const blobToDataURL0 = blob => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(blob); });
+async function backup() { try { const imgs = {}; for (const [id, p] of pending) if (!p.saved) imgs[id] = { data: await blobToDataURL0(p.blob), ext: p.ext };
+  localStorage.setItem(DRAFT, JSON.stringify({ state, imgs, ts: Date.now() })); } catch (e) {} }
+let saveTimer = 0, saving = false;
+function touch() { dirty++; clearTimeout(saveTimer); setMsg('busy', '잠시 후 자동 저장돼요…'); $('saveBtn').hidden = true; backup(); saveTimer = setTimeout(save, 1800); }
 async function enter() {
   $('lock').hidden = true; $('app').hidden = false;
   try { const f = await gh('/contents/' + DATA_PATH + '?ref=' + BRANCH + '&t=' + Date.now()); state = JSON.parse(fromB64utf8(f.content)); }
   catch (e) { if (e.status !== 404) toast('목록을 불러오지 못했어요'); state = { version: 1, blocks: [{ id: 't1', type: 'text', text: '더 둘러보기', on: true }, { id: 'l1', type: 'link', title: '복복이 장난감 상자', desc: '복복이의 다른 놀잇감 모음', url: 'https://bimirary-sys.github.io/', on: true }], archive: [] }; }
   state.blocks = state.blocks || []; state.archive = state.archive || [];
+  let d = null; try { d = JSON.parse(localStorage.getItem(DRAFT) || 'null'); } catch (e) {}
+  if (d && d.state && d.state.blocks) { state = d.state; state.archive = state.archive || [];
+    for (const id in (d.imgs || {})) { const b = await (await fetch(d.imgs[id].data)).blob(); pending.set(id, { blob: b, ext: d.imgs[id].ext, url: URL.createObjectURL(b) }); }
+    render(); toast('저장 안 된 작업을 이어서 저장할게요'); dirty = 1; save(); return; }
   render(); }
 
 /* ---------- render ---------- */
@@ -375,7 +390,7 @@ function editBlock(b, isNew) {
 }
 
 /* ---------- preview (the real notebook page, fed with unsaved data) ---------- */
-const blobToDataURL = blob => new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(blob); });
+const blobToDataURL = blobToDataURL0;
 async function previewData() { const blocks = [];
   for (const b of state.blocks) { const c = Object.assign({}, b); if (pending.has(b.id)) c.img = await blobToDataURL(pending.get(b.id).blob); blocks.push(c); }
   return { blocks }; }
@@ -386,18 +401,22 @@ $('pvBtn').onclick = async () => { const data = await previewData(); $('pvWrap')
   addEventListener('message', pvListener); $('pvFrame').src = '../?preview=1&t=' + Date.now(); };
 $('pvClose').onclick = () => { $('pvWrap').classList.remove('on'); $('pvFrame').src = 'about:blank'; };
 
-/* ---------- save: one commit with links.json + new images ---------- */
-$('saveBtn').onclick = async () => { const b = $('saveBtn'); b.disabled = true; b.textContent = '저장 중…'; $('saveMsg').textContent = '수첩에 올리는 중이에요';
+/* ---------- auto save: one commit with links.json + new images ---------- */
+async function save() { clearTimeout(saveTimer); if (saving) { saveTimer = setTimeout(save, 800); return; } if (!dirty) return;
+  saving = true; const mark = dirty; setMsg('busy', '저장 중…'); $('saveBtn').hidden = true;
   try {
-    const files = [], used = new Set(state.blocks.concat(state.archive).map(x => x.id));
-    for (const [id, p] of pending) { if (!used.has(id) || p.saved) continue; const blk = state.blocks.concat(state.archive).find(x => x.id === id); if (blk && blk.img && !files.some(f => f.path === 'note/' + blk.img)) files.push({ path: 'note/' + blk.img, blob: p.blob }); }
+    const files = [], sent = [], all = state.blocks.concat(state.archive), used = new Set(all.map(x => x.id));
+    for (const [id, p] of pending) { if (!used.has(id) || p.saved) continue; const blk = all.find(x => x.id === id); if (blk && blk.img && !files.some(f => f.path === 'note/' + blk.img)) { files.push({ path: 'note/' + blk.img, blob: p.blob }); sent.push(p); } }
     state.version = 1; state.updated = new Date().toISOString();
     files.push({ path: DATA_PATH, text: JSON.stringify(state, null, 2) + '\n' });
     await commitFiles(files, '건강수첩 링크 수정 (' + state.blocks.filter(x => x.on !== false).length + '개 보임)');
-    for (const p of pending.values()) p.saved = true;
-    dirty = 0; b.textContent = '저장하기'; $('saveMsg').innerHTML = '<b>저장했어요!</b> 1분쯤 뒤 수첩에 보여요'; toast('저장했어요 📒');
-  } catch (e) { b.disabled = false; b.textContent = '다시 저장'; $('saveMsg').innerHTML = '<b>저장 못 했어요</b> ' + esc(e.status === 401 ? '열쇠가 만료됐어요' : (e.detail || e.message)); } };
-const confirmLeave = () => { openSheet('<h2>저장 안 한 변경이 있어요</h2><p class="hint" style="text-align:center">먼저 아래 "저장하기"를 눌러 주세요.</p><div class="row2"><button class="btn sec" type="button" id="lOk">알겠어요</button></div>'); $('lOk').onclick = closeSheet; return false; };
+    sent.forEach(p => p.saved = true);
+    if (dirty === mark) { dirty = 0; try { localStorage.removeItem(DRAFT); } catch (e) {} setMsg('', '✓ 저장됨<small>1분쯤 뒤 수첩에 보여요</small>'); }
+    else { saveTimer = setTimeout(save, 600); }
+  } catch (e) { setMsg('bad', '저장 못 했어요<small>' + esc(e.status === 401 ? '열쇠가 만료됐어요. 열쇠를 다시 등록해 주세요.' : e.status === 409 || e.status === 422 ? '잠깐 겹쳤어요. "다시 저장"을 눌러 주세요.' : '인터넷 연결을 확인하고 "다시 저장"을 눌러 주세요.') + '</small>'); $('saveBtn').hidden = false; }
+  finally { saving = false; } }
+$('saveBtn').onclick = () => { if (!dirty) dirty = 1; save(); };
+const confirmLeave = () => { openSheet('<h2>아직 저장 중이에요</h2><p class="hint" style="text-align:center">아래에 "✓ 저장됨"이 나오면 잠가 주세요.</p><div class="row2"><button class="btn sec" type="button" id="lOk">알겠어요</button></div>'); $('lOk').onclick = closeSheet; return false; };
 addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 /* ---------- start ---------- */
