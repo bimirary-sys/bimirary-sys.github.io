@@ -11,6 +11,12 @@
 <meta property="og:url" content="https://bimirary-sys.github.io/">
 <meta name="theme-color" content="#f6eff3">
 <link rel="canonical" href="https://bimirary-sys.github.io/">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="복복이 상자">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
@@ -56,6 +62,30 @@ body{font-family:"Gowun Dodum",system-ui,sans-serif;color:var(--ink);background:
 .foot{margin:22px 0 0;text-align:center;font-size:12px;color:var(--sub)}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 40px);transform:translateX(-50%);z-index:9;background:rgba(75,58,63,.92);color:#fff;padding:11px 16px;border-radius:14px;font:15px Jua,sans-serif;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
 .toast.on{opacity:1}
+/* home-screen shortcut helper */
+.links .addhome{border-style:dashed;border-color:rgba(236,127,161,.45);background:rgba(255,250,243,.72);box-shadow:0 3px 0 rgba(236,127,161,.12)}
+.links .addhome .dot{display:grid;place-items:center;background:#fff;box-shadow:inset 0 0 0 2px rgba(246,179,198,.8);font-size:15px}
+.links .addhome .arr{font-size:24px}
+.sheetBg{position:fixed;inset:0;z-index:7;background:rgba(75,58,63,.32);opacity:0;pointer-events:none;transition:opacity .25s}
+.sheetBg.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:8;max-width:520px;margin:0 auto;max-height:86%;overflow-y:auto;background:#fffaf3;border-radius:26px 26px 0 0;
+  padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);box-shadow:0 -10px 30px rgba(120,70,80,.18);transform:translateY(105%);transition:transform .38s cubic-bezier(.2,1.1,.3,1)}
+.sheet.on{transform:none}
+.sheet .grab{width:44px;height:5px;border-radius:9px;background:#ead6dc;margin:0 auto 12px}
+.sheet h2{margin:4px 0 4px;font:400 21px/1.3 Jua,sans-serif;text-align:center}
+.sheet .lead{margin:0 0 14px;text-align:center;font-size:14px;color:var(--sub)}
+.sheet ol{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:st}
+.sheet li{counter-increment:st;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#fff;border:2px solid rgba(246,179,198,.4);font-size:15px;line-height:1.45}
+.sheet li:before{content:counter(st);flex:none;width:26px;height:26px;border-radius:50%;background:var(--box);color:#fff;font:15px/26px Jua,sans-serif;text-align:center}
+.sheet b{font-family:Jua,sans-serif;font-weight:400;color:var(--accent)}
+.sheet .ico{display:inline-grid;place-items:center;vertical-align:-5px;width:24px;height:24px;margin:0 2px;border-radius:7px;background:#f3ecef;color:#3b82f6}
+.sheet .ico svg{width:16px;height:16px}
+.sheet .note{margin:12px 2px 0;font-size:12.5px;color:var(--sub);line-height:1.55}
+.sheet .row{display:flex;gap:8px;margin-top:14px}
+.sheet .bigbtn,.sheet .subbtn{flex:1;border:0;cursor:pointer;border-radius:16px;padding:14px;font:17px Jua,sans-serif;text-decoration:none;text-align:center}
+.sheet .bigbtn{background:var(--accent);color:#fff;box-shadow:0 4px 0 #d9658a}
+.sheet .bigbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #d9658a}
+.sheet .subbtn{background:#f6ecef;color:var(--ink)}
 .fade{position:fixed;inset:0;z-index:4;background:var(--lining);opacity:0;pointer-events:none;transition:opacity .3s}
 .fade.on{opacity:1}
 </style>
@@ -72,6 +102,14 @@ body{font-family:"Gowun Dodum",system-ui,sans-serif;color:var(--ink);background:
     <p class="foot">made by 복복이 🧸</p>
   </div>
 </section>
+<div class="sheetBg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" aria-hidden="true">
+  <div class="grab"></div>
+  <h2 id="shTitle">홈 화면에 복복이 상자 추가하기</h2>
+  <p class="lead">한 번 추가해 두면 앱처럼 톡 눌러 바로 열려요 🧸</p>
+  <div id="shBody"></div>
+  <div class="row"><button class="subbtn" id="shClose" type="button">닫기</button></div>
+</div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
@@ -104,6 +142,62 @@ LINKS.forEach(l => {
 let tt; function showToast(t) { toast.textContent = t; toast.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove('on'), 1800); }
 function revealLinks() { [...list.children].forEach((li, i) => setTimeout(() => li.classList.add('show'), 70 + i * 70)); }
 function hideLinks() { [...list.children].forEach(li => li.classList.remove('show')); }
+
+/* ---------- 홈 화면에 추가 안내 ---------- */
+const HOME_URL = 'https://bimirary-sys.github.io/';
+const ua = navigator.userAgent || '';
+const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/i.test(ua);
+const inApp = /KAKAOTALK|Instagram|FBAN|FBAV|FB_IAB|NAVER\(inapp|; wv\)|Line\/|DaumApps|everytimeApp|Twitter|Threads|BAND\//i.test(ua);
+const isKakao = /KAKAOTALK/i.test(ua), isSamsung = /SamsungBrowser/i.test(ua);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let installEvt = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
+addEventListener('appinstalled', () => { installEvt = null; closeSheet(); showToast('홈 화면에 복복이 상자가 생겼어요 🧸'); const h = $('addHomeLi'); if (h) h.remove(); });
+if (!standalone()) {
+  const li = document.createElement('li'); li.id = 'addHomeLi';
+  li.innerHTML = '<button type="button" class="addhome" id="addHome"><span class="dot">📲</span><span class="nm">홈 화면에 추가하기<small>복복이 상자를 앱처럼 바로 열어요</small></span><span class="arr">+</span></button>';
+  list.appendChild(li); li.querySelector('button').addEventListener('click', openSheet);
+}
+const ICON = {
+  share: '<span class="ico" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg></span>',
+  more: '<span class="ico" aria-label="더보기" style="color:#4b3a3f"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></span>',
+  dots: '<span class="ico" aria-label="메뉴" style="color:#4b3a3f"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></span>',
+  burger: '<span class="ico" aria-label="메뉴" style="color:#4b3a3f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"/></svg></span>'
+};
+function sheetHTML() {
+  const copyBtn = '<button class="subbtn" id="shCopy" type="button">주소 복사하기</button>';
+  if (inApp) {
+    let open = '';
+    if (isKakao) open = '<a class="bigbtn" href="kakaotalk://web/openExternal?url=' + encodeURIComponent(HOME_URL) + '">브라우저로 열기</a>';
+    else if (isAndroid) open = '<a class="bigbtn" href="intent://bimirary-sys.github.io/#Intent;scheme=https;package=com.android.chrome;end">Chrome으로 열기</a>';
+    return '<ol><li><span>지금은 앱 안에서 열려 있어서 바로 추가할 수 없어요.</span></li>' +
+      '<li><span>오른쪽 위 ' + ICON.more + ' 또는 ' + ICON.dots + ' 를 누르고 <b>' + (isIOS ? "'Safari로 열기'" : "'다른 브라우저로 열기'") + '</b>를 골라 주세요.</span></li>' +
+      '<li><span>열린 화면에서 상자를 열고 이 버튼을 한 번 더 눌러 주세요.</span></li></ol>' +
+      '<div class="row">' + open + copyBtn + '</div><p class="note">메뉴가 안 보이면 주소를 복사해서 ' + (isIOS ? 'Safari' : 'Chrome') + ' 주소창에 붙여 넣어 주세요.</p>';
+  }
+  if (isIOS) {
+    const other = /CriOS|FxiOS|EdgiOS|Whale/.test(ua);
+    return '<ol><li><span>' + (other ? '주소창 옆 ' + ICON.share + ' <b>공유</b> 버튼을 눌러요.' : '화면 아래 ' + ICON.share + ' <b>공유</b> 버튼을 눌러요. 안 보이면 ' + ICON.more + ' 를 먼저 눌러요.') + '</span></li>' +
+      '<li><span>목록을 아래로 내려 <b>홈 화면에 추가</b>를 눌러요.</span></li>' +
+      '<li><span>이름이 <b>복복이 상자</b>인지 보고 오른쪽 위 <b>추가</b>를 누르면 끝!</span></li></ol>';
+  }
+  if (isAndroid) {
+    const one = installEvt ? '<div class="row"><button class="bigbtn" id="shInstall" type="button">홈 화면에 추가</button></div><p class="note">버튼이 안 되면 아래 방법으로 추가해 주세요.</p>' : '';
+    const steps = isSamsung
+      ? '<ol><li><span>화면 아래 ' + ICON.burger + ' <b>메뉴</b>를 눌러요.</span></li><li><span><b>페이지 추가</b> → <b>홈 화면</b>을 눌러요.</span></li><li><span><b>추가</b>를 누르면 끝!</span></li></ol>'
+      : '<ol><li><span>오른쪽 위 ' + ICON.dots + ' <b>메뉴</b>를 눌러요.</span></li><li><span><b>홈 화면에 추가</b>(또는 <b>앱 설치</b>)를 눌러요.</span></li><li><span><b>추가</b> 또는 <b>설치</b>를 누르면 끝!</span></li></ol>';
+    return one + steps;
+  }
+  return '<ol><li><span>휴대폰으로 이 페이지를 열면 홈 화면에 추가할 수 있어요.</span></li></ol><div class="row">' + copyBtn + '</div>';
+}
+const sheet = $('sheet'), sheetBg = $('sheetBg');
+function openSheet() { $('shBody').innerHTML = sheetHTML(); sheet.classList.add('on'); sheetBg.classList.add('on'); sheet.setAttribute('aria-hidden', 'false');
+  const c = $('shCopy'); if (c) c.addEventListener('click', () => { const done = () => showToast('주소를 복사했어요'); if (navigator.clipboard) navigator.clipboard.writeText(HOME_URL).then(done, () => prompt('주소를 길게 눌러 복사해 주세요', HOME_URL)); else prompt('주소를 길게 눌러 복사해 주세요', HOME_URL); });
+  const b = $('shInstall'); if (b) b.addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; closeSheet(); }); }
+function closeSheet() { sheet.classList.remove('on'); sheetBg.classList.remove('on'); sheet.setAttribute('aria-hidden', 'true'); }
+$('shClose').addEventListener('click', closeSheet); sheetBg.addEventListener('click', closeSheet);
+addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('on')) { e.stopImmediatePropagation(); closeSheet(); } });
 
 /* ---------- renderer / scene ---------- */
 const R = new T.WebGLRenderer({ canvas, antialias: true, alpha: true });
