@@ -18,11 +18,11 @@
 html,body{margin:0;min-height:100%;background:var(--mint2);color:var(--ink);font-family:"Gowun Dodum",system-ui,sans-serif}
 /* ---------- intro ---------- */
 #intro{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 80% at 50% 35%,#e9f8f1 0%,#cfeadd 60%,#bfe2d2 100%);z-index:5}
-#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-#openBtn{position:absolute;left:50%;bottom:calc(9vh + env(safe-area-inset-bottom));transform:translateX(-50%);border:0;cursor:pointer;
- font-family:Jua,sans-serif;font-size:22px;color:#fff;background:var(--coral);padding:16px 30px;border-radius:999px;box-shadow:0 8px 0 #e46f60,0 14px 24px rgba(80,60,60,.18);
- animation:bob 1.4s ease-in-out infinite;white-space:nowrap}
-#openBtn:active{transform:translateX(-50%) translateY(4px);box-shadow:0 4px 0 #e46f60}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation}
+#openBtn{position:absolute;left:50%;top:76%;transform:translateX(-50%);border:0;background:none;cursor:pointer;padding:12px 18px;
+ font:22px/1 Jua,sans-serif;color:#ec8d86;white-space:nowrap;letter-spacing:.01em;text-shadow:0 1px 0 rgba(255,255,255,.8);transition:opacity .3s}
+#openBtn .up{display:inline-block;margin-left:4px;font-size:18px;transform:translateY(-2px);animation:nudge 1.4s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(-7px)}}
 @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -7px}}
 #flash{position:absolute;inset:0;background:var(--cream);opacity:0;pointer-events:none}
 #intro.gone{opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
@@ -58,11 +58,11 @@ h1{font-family:Jua,sans-serif;font-weight:400;font-size:34px;margin:6px 0 2px;co
 .foot p{margin:6px 0}
 .btns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 .btns a,.btns button{font-family:Jua,sans-serif;font-size:15px;border:0;cursor:pointer;text-decoration:none;padding:10px 16px;border-radius:12px;background:#e3f3ec;color:#2f6a55}
-@media (prefers-reduced-motion:reduce){#openBtn{animation:none}}
+@media (prefers-reduced-motion:reduce){#openBtn .up{animation:none}}
 </style>
 </head>
 <body>
-<div id="intro"><canvas id="cv"></canvas><div id="flash"></div><button id="openBtn" aria-label="복복이 건강수첩 열기">복복이 건강수첩 보기 ▲</button></div>
+<div id="intro"><canvas id="cv"></canvas><div id="flash"></div><button id="openBtn" type="button" aria-label="복복이 건강수첩 열기">복복이 건강수첩 보기<span class="up">▲</span></button></div>
 
 <div id="note" aria-hidden="true">
   <div class="disc" role="note" aria-label="이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."><div class="track" aria-hidden="true"><span>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span><span>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span><span>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span><span>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span></div></div>
@@ -95,6 +95,7 @@ function buildList() { const L = $('list');
   L.innerHTML = NOTES.map(n => '<section class="ep"><h2>' + esc(n.ep) + (n.title ? ' · ' + esc(n.title) : '') + '</h2>' + (n.memo ? '<div class="memo">📝 ' + n.memo + '</div>' : '') + (n.src ? '<div class="src">출처: ' + esc(n.src) + '</div>' : '') +
     (n.items || []).map(it => '<div class="item" id="' + esc(it.no) + '"><div class="no">' + esc(it.no) + '</div><div class="txt"><b>' + esc(it.name) + '</b><span>' + esc(it.desc) + '</span></div><a class="go" href="' + esc(it.url) + '" target="_blank" rel="sponsored noopener">쿠팡에서 보기 →</a></div>').join('') + '</section>').join(''); }
 buildList();
+let running = false;
 function showNote(instant) { const I = $('intro'), N = $('note'); I.classList.add('gone'); N.setAttribute('aria-hidden', 'false'); requestAnimationFrame(() => N.classList.add('show')); document.body.style.overflow = ''; running = false;
   const h = decodeURIComponent(location.hash.slice(1)); if (h && h !== '목록' && h !== 'list') { const el = document.getElementById(h); if (el) setTimeout(() => el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'center' }), 120); } }
 $('closeBtn').onclick = () => { const N = $('note'); N.classList.remove('show'); N.setAttribute('aria-hidden', 'true'); setTimeout(() => { window.scrollTo(0, 0); reset(); $('intro').classList.remove('gone'); running = true; loop(); }, 300); };
@@ -106,53 +107,112 @@ if (direct || reduce || !window.THREE) { showNote(true); if (!window.THREE) retu
 let ac = null; const au = () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} };
 function blip(f, d, type, v, f2) { if (!ac) return; const o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, ac.currentTime); if (f2) o.frequency.exponentialRampToValueAtTime(f2, ac.currentTime + d); g.gain.setValueAtTime(v, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + d); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + d); }
 function noise(d, v, lo, hi) { if (!ac) return; const n = ac.sampleRate * d, b = ac.createBuffer(1, n, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / n); const s = ac.createBufferSource(); s.buffer = b; const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(lo, ac.currentTime); f.frequency.exponentialRampToValueAtTime(hi, ac.currentTime + d); const g = ac.createGain(); g.gain.value = v; s.connect(f).connect(g).connect(ac.destination); s.start(); }
-/* ---------- 3D notebook ---------- */
-const T = THREE, cv = $('cv');
-const R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); R.setPixelRatio(Math.min(2, devicePixelRatio)); R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = .92;
-const S = new T.Scene(); S.add(new T.HemisphereLight(0xffffff, 0xcfe6dc, .6)); const key = new T.DirectionalLight(0xfff4ea, 1.0); key.position.set(-3, 5, 6); S.add(key); const rim = new T.DirectionalLight(0xe0fff2, .35); rim.position.set(4, -2, 3); S.add(rim);
+/* ---------- 3D six-ring binder ---------- */
+if (!CanvasRenderingContext2D.prototype.roundRect) CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) { this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); };
+const T = THREE, cv = $('cv'), btn = $('openBtn');
+const R = new T.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); R.setPixelRatio(Math.min(2, devicePixelRatio)); R.outputEncoding = T.sRGBEncoding; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = .95;
+const S = new T.Scene(); S.add(new T.HemisphereLight(0xffffff, 0xd6ece2, .7)); const key = new T.DirectionalLight(0xfff6ea, .95); key.position.set(-3, 5, 6); S.add(key); const rim = new T.DirectionalLight(0xe8fff4, .35); rim.position.set(4, -2, 3); S.add(rim);
 const cam = new T.PerspectiveCamera(32, 1, .05, 100);
 const L = c => new T.Color(c).convertSRGBToLinear();
-const mat = (c, o) => new T.MeshPhysicalMaterial(Object.assign({ color: L(c), roughness: .55, clearcoat: .35, clearcoatRoughness: .4 }, o || {}));
-const tex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8; return t; };
+const cnv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const texOf = c => { const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8; return t; };
 function rslab(w, h, d, r) { const s = new T.Shape(), x = -w / 2, y = -h / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h); s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y); const g = new T.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: .02, bevelSize: .02, bevelSegments: 3, curveSegments: 8 }); g.translate(0, 0, -d / 2); return g; }
-const BW = 1.6, BH = 2.2;
+// soft studio environment so the metal rings read as silver
+{ const c = cnv(16, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.45, '#f4fbf8'); gr.addColorStop(.55, '#9aa6b0'); gr.addColorStop(1, '#dfeee8'); g.fillStyle = gr; g.fillRect(0, 0, 16, 256);
+  const es = new T.Scene(); es.add(new T.Mesh(new T.SphereGeometry(5, 24, 16), new T.MeshBasicMaterial({ map: texOf(c), side: T.BackSide }))); const pm = new T.PMREMGenerator(R); var ENV = pm.fromScene(es, .02).texture; pm.dispose(); }
+const BW = 1.6, BH = 2.2, XC = -BW / 2 + .02, RR = .21, RT = .046, HX = -.6, RY = [.84, .63, .42, -.42, -.63, -.84];
+const PW = BW - .06, PH = BH - .07, PD = .17;
 const book = new T.Group(); S.add(book);
-const coverM = mat('#ffe6c4'), edgeM = mat('#fffaf0', { roughness: .9, clearcoat: 0 });
-const back = new T.Mesh(rslab(BW, BH, .05, .1), coverM); back.position.z = -.14; book.add(back);
-const pageTex = tex(512, 704, (g, w, h) => { g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d6ece2'; g.lineWidth = 3; for (let y = 90; y < h - 30; y += 42) { g.beginPath(); g.moveTo(30, y); g.lineTo(w - 30, y); g.stroke(); } g.fillStyle = '#ffc2b8'; g.fillRect(56, 0, 3, h);
+// ---- cover textures (512 px = 1.6 units) ----
+const toPx = (x, y, w, h, W, H) => [(x / W + .5) * w, (.5 - y / H) * h];
+function holes(g, w, h, W, H, hx) { for (const y of RY) { const [px, py] = toPx(hx, y, w, h, W, H);
+  const sh = g.createRadialGradient(px + 3, py + 4, 6, px + 3, py + 4, 26); sh.addColorStop(0, 'rgba(110,90,40,.32)'); sh.addColorStop(1, 'rgba(110,90,40,0)'); g.fillStyle = sh; g.beginPath(); g.arc(px + 3, py + 4, 26, 0, 7); g.fill();
+  g.fillStyle = '#f7f1e2'; g.beginPath(); g.arc(px, py, 12, 0, 7); g.fill(); g.strokeStyle = 'rgba(120,100,60,.35)'; g.lineWidth = 3; g.beginPath(); g.arc(px, py, 12, 0, 7); g.stroke(); } }
+function coverCanvas(base, hx, label) { const c = cnv(512, 704), g = c.getContext('2d'), w = 512, h = 704; g.fillStyle = base; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 900; i++) { g.fillStyle = Math.random() < .5 ? 'rgba(255,255,255,.18)' : 'rgba(200,170,60,.06)'; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
+  holes(g, w, h, BW, BH, hx);
+  if (label) { const [cx, cy] = toPx(-.03, .3, w, h, BW, BH), lw = 246, lh = 100; g.save(); g.shadowColor = 'rgba(90,120,100,.25)'; g.shadowBlur = 8; g.shadowOffsetY = 4; g.fillStyle = '#c4ead8'; g.beginPath(); g.roundRect(cx - lw / 2, cy - lh / 2, lw, lh, 22); g.fill(); g.restore();
+    g.setLineDash([10, 8]); g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 3; g.beginPath(); g.roundRect(cx - lw / 2 + 10, cy - lh / 2 + 10, lw - 20, lh - 20, 14); g.stroke(); g.setLineDash([]);
+    g.fillStyle = '#3d7a63'; g.font = '54px Jua, "Gowun Dodum", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('BOKBOK', cx, cy + 3); }
+  return c; }
+const LEMON = '#ffe57c';
+const frontC = coverCanvas(LEMON, HX, true), frontT = texOf(frontC);
+for (const t of [frontT]) { t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1 / BW, 1 / BH); t.offset.set(.5, .5); }
+const backT = texOf(coverCanvas(LEMON, HX, false)); backT.wrapS = backT.wrapT = T.RepeatWrapping; backT.repeat.set(1 / BW, 1 / BH); backT.offset.set(.5, .5);
+const matte = (o) => new T.MeshStandardMaterial(Object.assign({ roughness: .88, metalness: 0 }, o));
+const sideM = matte({ color: L('#f2d562') });
+const frontM = matte({ map: frontT }), backM = matte({ map: backT });
+if (document.fonts && document.fonts.load) document.fonts.load('54px Jua').then(() => { const c2 = coverCanvas(LEMON, HX, true); frontC.getContext('2d').drawImage(c2, 0, 0); frontT.needsUpdate = true; }).catch(() => {});
+// back cover
+const back = new T.Mesh(rslab(BW, BH, .05, .12), [backM, sideM]); back.position.z = -.14; book.add(back);
+// paper block: front sheet + layered edges
+const pageC = cnv(512, 704); { const g = pageC.getContext('2d'), w = 512, h = 704; g.fillStyle = '#fffdf6'; g.fillRect(0, 0, w, h); g.strokeStyle = '#d6ece2'; g.lineWidth = 3; for (let y = 96; y < h - 30; y += 42) { g.beginPath(); g.moveTo(110, y); g.lineTo(w - 28, y); g.stroke(); } g.fillStyle = '#ffc2b8'; g.fillRect(96, 0, 3, h);
   const ic = (k, x, y, c) => { g.fillStyle = c; g.beginPath(); if (k === 'h') { g.moveTo(x, y + 22); g.bezierCurveTo(x - 40, y - 4, x - 18, y - 32, x, y - 12); g.bezierCurveTo(x + 18, y - 32, x + 40, y - 4, x, y + 22); } else if (k === 'a') { g.arc(x, y, 22, 0, 7); } else { g.ellipse(x, y, 30, 13, -.6, 0, 7); } g.fill(); };
-  ic('a', 140, 190, '#ff8a8a'); ic('p', 330, 270, '#ffb47a'); ic('h', 170, 420, '#ff9fbd'); ic('a', 360, 520, '#9fd8a8'); g.fillStyle = 'rgba(255,236,120,.6)'; g.fillRect(220, 176, 200, 24); g.fillRect(100, 300, 160, 24); g.fillRect(240, 410, 190, 24); g.fillRect(110, 600, 250, 24); });
-const pages = new T.Mesh(new T.BoxGeometry(BW - .1, BH - .1, .2), [edgeM, edgeM, edgeM, edgeM, new T.MeshStandardMaterial({ map: pageTex, roughness: .9 }), edgeM]); pages.position.z = -.02; book.add(pages);
-const pivot = new T.Group(); pivot.position.set(-BW / 2, 0, .1); book.add(pivot);
-const front = new T.Mesh(rslab(BW, BH, .05, .1), coverM); front.position.x = BW / 2; pivot.add(front);
-const insideCover = new T.Mesh(new T.PlaneGeometry(BW - .16, BH - .16), new T.MeshStandardMaterial({ color: L('#cfe9dd'), roughness: .9 })); insideCover.position.set(BW / 2, 0, -.03); insideCover.rotation.y = Math.PI; pivot.add(insideCover);
-// subtle embossed corner stitch on the cover (no text)
-const stitch = new T.Mesh(new T.TorusGeometry(.18, .012, 6, 40), mat('#ffc2b8')); stitch.position.set(BW / 2 + .45, .72, .035); pivot.add(stitch);
-const spine = new T.Mesh(new T.CylinderGeometry(.14, .14, BH, 24, 1, false, Math.PI, Math.PI), mat('#ffe9cf')); spine.position.set(-BW / 2, 0, -.02); book.add(spine);
-const band = new T.Group(); book.add(band); const bandM = mat('#ff8a7a', { roughness: .4 }); const bandMesh = new T.Mesh(new T.BoxGeometry(.11, BH + .04, .03), bandM); bandMesh.position.set(BW / 2 - .28, 0, .14); band.add(bandMesh); const bandBack = new T.Mesh(new T.BoxGeometry(.11, BH + .04, .03), bandM); bandBack.position.set(BW / 2 - .28, 0, -.18); band.add(bandBack);
+  ic('a', 170, 190, '#ff8a8a'); ic('p', 350, 270, '#ffb47a'); ic('h', 200, 420, '#ff9fbd'); ic('a', 380, 520, '#9fd8a8'); g.fillStyle = 'rgba(255,236,120,.6)'; g.fillRect(240, 176, 190, 24); g.fillRect(130, 300, 160, 24); g.fillRect(260, 410, 180, 24); g.fillRect(150, 600, 240, 24);
+  for (const y of RY) { const [px, py] = toPx(HX - 0, y, w, h, PW, PH); g.fillStyle = 'rgba(150,140,120,.16)'; g.beginPath(); g.arc(px + 2, py + 3, 15, 0, 7); g.fill(); g.fillStyle = '#efe7d6'; g.beginPath(); g.arc(px, py, 11, 0, 7); g.fill(); } }
+const stripe = (vertical) => { const c = cnv(vertical ? 128 : 16, vertical ? 16 : 128), g = c.getContext('2d'); g.fillStyle = '#fffaf0'; g.fillRect(0, 0, c.width, c.height); g.fillStyle = '#e9e0cf'; for (let i = 0; i < 128; i += 5) vertical ? g.fillRect(i, 0, 1.6, 16) : g.fillRect(0, i, 16, 1.6); return texOf(c); };
+const edgeU = matte({ map: stripe(true) }), edgeV = matte({ map: stripe(false) }), plain = matte({ color: L('#fffaf0') });
+const pages = new T.Mesh(new T.BoxGeometry(PW, PH, PD), [edgeU, edgeU, edgeV, edgeV, matte({ map: texOf(pageC) }), plain]); pages.position.set(0, 0, -.005); book.add(pages);
+// six chunky silver rings, through cover holes and paper
+const ringM = new T.MeshStandardMaterial({ color: L('#eef1f5'), metalness: .92, roughness: .2, envMap: ENV, envMapIntensity: 1.1 });
+const ringG = new T.TorusGeometry(RR, RT, 16, 56);
+for (const y of RY) { const r = new T.Mesh(ringG, ringM); r.rotation.x = Math.PI / 2; r.position.set(XC, y, 0); book.add(r); }
+// front cover hinges on the ring axis
+const pivot = new T.Group(); pivot.position.set(XC, 0, 0); book.add(pivot);
+const front = new T.Mesh(rslab(BW, BH, .05, .12), [frontM, sideM]); front.position.set(-XC, 0, .135); pivot.add(front);
+const inC = cnv(512, 704); { const g = inC.getContext('2d'); g.fillStyle = '#fff2b8'; g.fillRect(0, 0, 512, 704); holes(g, 512, 704, BW, BH, -HX); }
+const inside = new T.Mesh(new T.PlaneGeometry(BW, BH), matte({ map: texOf(inC) })); inside.position.set(-XC, 0, .135 - .052); inside.rotation.y = Math.PI; pivot.add(inside);
+// milky pastel-red elastic band across the right side
+const band = new T.Group(); band.position.set(BW / 2, 0, 0); book.add(band);
+const bandM = matte({ color: L('#f3a59e'), roughness: .6, transparent: true });
+const BX = -.3; for (const [w, h, d, x, y, z] of [[.12, BH + .06, .03, BX, 0, .2], [.12, BH + .06, .03, BX, 0, -.2], [.12, .03, .43, BX, BH / 2 + .03, 0], [.12, .03, .43, BX, -BH / 2 - .03, 0]]) { const m = new T.Mesh(new T.BoxGeometry(w, h, d), bandM); m.position.set(x, y, z); band.add(m); }
 // floating sparkles
-const spark = []; const sg = new T.OctahedronGeometry(.05, 0); for (let i = 0; i < 26; i++) { const m = new T.Mesh(sg, new T.MeshBasicMaterial({ color: L(['#ffffff', '#fff3a0', '#ffd0dc', '#d6f5ff'][i % 4]), transparent: true, opacity: .85 })); m.position.set((Math.random() - .5) * 7, (Math.random() - .5) * 9, -1.5 - Math.random() * 3); m.userData.p = Math.random() * 6; S.add(m); spark.push(m); }
-function size() { const w = innerWidth, h = innerHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+const spark = []; const sg = new T.OctahedronGeometry(.05, 0); for (let i = 0; i < 24; i++) { const m = new T.Mesh(sg, new T.MeshBasicMaterial({ color: L(['#ffffff', '#fff3a0', '#ffd0dc', '#d6f5ff'][i % 4]), transparent: true, opacity: .85 })); m.position.set((Math.random() - .5) * 7, (Math.random() - .5) * 9, -1.5 - Math.random() * 3); m.userData.p = Math.random() * 6; S.add(m); spark.push(m); }
+// ---- layout ----
+const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x), easeIn = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * x, easeOut = x => x <= 0 ? 0 : x >= 1 ? 1 : 1 - (1 - x) ** 3, cl = x => Math.max(0, Math.min(1, x)), seg = (k, a, b) => cl((k - a) / (b - a));
+const vfit = (wid, hei) => { const tf = Math.tan(cam.fov * Math.PI / 360); return Math.max(wid / (2 * tf * cam.aspect), hei / (2 * tf)); };
+let D0 = 8, DS = 10;
+function size() { const w = innerWidth, h = innerHeight; R.setSize(w, h, false); cam.aspect = w / h; cam.fov = 32; cam.updateProjectionMatrix(); D0 = vfit(2.25, 3.1); DS = Math.max(D0, vfit(3.75, 3.2));
+  const p = new T.Vector3(0, -BH / 2 - .1, 0); cam.position.set(0, .45, D0); cam.lookAt(0, 0, 0); cam.updateMatrixWorld(); p.project(cam); btn.style.top = Math.min(h - 64, (-p.y * .5 + .5) * h + 6) + 'px'; }
 addEventListener('resize', size); size();
-const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x), easeIn = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * x;
-let running = !direct && !reduce, opening = -1, speed = 1, t0 = performance.now();
-function baseCam() { return Math.max(6.4, 7.4 * (.62 / Math.min(cam.aspect, .62))); }
-function reset() { $('openBtn').style.visibility = ''; opening = -1; pivot.rotation.y = 0; band.position.set(0, 0, 0); band.rotation.set(0, 0, 0); band.visible = true; $('flash').style.opacity = 0; }
+// ---- timeline (seconds at first-visit speed) ----
+const TL = { spin0: .08, spin1: 1.22, band0: .92, band1: 1.34, open0: 1.18, open1: 1.78, dive0: 1.95, dive1: 2.55, flash0: 2.32, end: 2.6 };
+running = !direct && !reduce; let opening = -1, speed = 1, t0 = performance.now(), fired = {}, yaw0 = 0, rx0 = 0, rz0 = 0, y0 = 0;
+const once = (k, f) => { if (!fired[k]) { fired[k] = 1; f(); } };
+function resetBook() { pivot.rotation.y = 0; band.position.set(BW / 2, 0, 0); band.rotation.set(0, 0, 0); band.visible = true; bandM.opacity = 1; book.position.set(0, 0, 0); book.scale.setScalar(1); }
+function reset() { btn.style.visibility = ''; opening = -1; fired = {}; resetBook(); $('flash').style.opacity = 0; }
 function frame(now) { const t = (now - t0) / 1000;
   for (const m of spark) { m.position.y += .004; if (m.position.y > 4.5) m.position.y = -4.5; m.rotation.y += .02; m.material.opacity = .45 + .4 * Math.sin(t * 2 + m.userData.p); }
-  const D = baseCam();
-  if (opening < 0) { book.position.set(0, .25 + Math.sin(t * 1.3) * .12, 0); book.rotation.set(Math.sin(t * .9) * .08 - .05, Math.sin(t * .6) * .32, Math.sin(t * .8) * .06); cam.fov = 32; cam.updateProjectionMatrix(); cam.position.set(0, 0, D); cam.lookAt(0, .1, 0); }
+  if (opening < 0) { // weightless idle float
+    book.position.set(0, .12 + Math.sin(t * 1.2) * .13, 0); book.rotation.set(-.1 + Math.sin(t * .9) * .05, .3 + Math.sin(t * .55) * .16, Math.sin(t * .8) * .04);
+    cam.fov = 32; cam.updateProjectionMatrix(); cam.position.set(0, .45, D0); cam.lookAt(0, 0, 0); }
   else { const k = (now - opening) / 1000 * speed;
-    book.rotation.x *= .85; book.rotation.y *= .85; book.rotation.z *= .85; book.position.y += (0 - book.position.y) * .15;
-    const kb = ease(k / .15); band.position.set(kb * 1.2, kb * .4, kb * .6); band.rotation.z = -kb * .9; band.visible = kb < 1;
-    const kc = ease((k - .15) / .4); pivot.rotation.y = -kc * Math.PI * .96;
-    const kz = easeIn((k - .5) / .55); const tx = .35; cam.position.set(tx * kz, .0, D - (D - .25) * kz); cam.lookAt(tx * kz, 0, -.2); cam.fov = 32 - 10 * kz; cam.updateProjectionMatrix();
-    $('flash').style.opacity = Math.max(0, Math.min(1, (k - .8) / .25));
-    if (k >= 1.08) { try { localStorage.setItem('bokbok_note_seen', '1'); } catch (e) {} showNote(false); return false; } }
+    // 1) hop + spin closed, as one object, decelerating face-on
+    const hop = Math.sin(seg(k, 0, 1.25) * Math.PI) * .42, sq = Math.sin(seg(k, 0, .14) * Math.PI) * .07;
+    book.scale.set(1 + sq * .5, 1 - sq, 1 + sq * .5);
+    const s = seg(k, TL.spin0, TL.spin1), sp = .3 * ease(s) + .7 * easeOut(s);
+    const settle = 1 - ease(seg(k, 0, TL.spin1));
+    book.rotation.set(rx0 * settle, yaw0 + (Math.PI * 4 - yaw0) * sp, rz0 * settle);
+    // 2) band pops off the right edge and tumbles behind
+    const b1 = easeOut(seg(k, TL.band0, TL.band0 + .16)), b2 = ease(seg(k, TL.band0 + .1, TL.band1));
+    band.position.set(BW / 2 + .44 * b1 + .2 * b2, .06 * Math.sin(b1 * Math.PI), -.7 * b2); band.rotation.set(0, 1.9 * b2, .25 * b2); bandM.opacity = 1 - b2; band.visible = b2 < 1;
+    if (k > TL.band0) once('snap', () => blip(1150, .07, 'square', .045, 650));
+    // 3) cover swings open around the six rings, spread centred
+    const o = ease(seg(k, TL.open0, TL.open1)); pivot.rotation.y = -Math.PI * o; if (k > TL.open0) once('page', () => noise(.45, .13, 600, 3800));
+    book.position.set(-XC * o, y0 * settle + hop * (1 - o), 0);
+    // 4) camera: pull back to show the spread, then glide into the right page
+    const z = easeIn(seg(k, TL.dive0, TL.dive1)), D = D0 + (DS - D0) * ease(seg(k, TL.open0, TL.open1)), px = -XC;
+    cam.position.set(px * z, .45 * (1 - ease(seg(k, TL.open0, TL.dive0))) * (1 - z), D + (.33 - D) * z); cam.lookAt(px * z, 0, 0); cam.fov = 32 - 10 * z; cam.updateProjectionMatrix();
+    if (k > TL.dive0) once('whoosh', () => noise(.5 / speed, .06, 300, 2200));
+    $('flash').style.opacity = seg(k, TL.flash0, TL.end);
+    if (k >= TL.end) { try { localStorage.setItem('bokbok_note_seen', '1'); } catch (e) {} showNote(false); return false; } }
   R.render(S, cam); return true; }
 function loop() { if (!running) return; if (frame(performance.now()) !== false) requestAnimationFrame(loop); }
-function open() { if (opening >= 0) return; au(); $('openBtn').style.visibility = 'hidden'; speed = seen ? 2.6 : 1; opening = performance.now(); blip(900, .08, 'triangle', .05, 600); setTimeout(() => noise(.25, .12, 2500, 6000), 150 / speed); setTimeout(() => noise(.45, .1, 400, 3000), 520 / speed); }
-$('openBtn').onclick = open; cv.addEventListener('pointerdown', open);
+function open() { if (opening >= 0 || !running) return; au(); btn.style.visibility = 'hidden'; speed = seen ? TL.end / .6 : 1;
+  yaw0 = book.rotation.y; rx0 = book.rotation.x; rz0 = book.rotation.z; y0 = book.position.y; fired = {}; opening = performance.now(); blip(700, .1, 'sine', .05, 1100); }
+btn.onclick = open;
+const ray = new T.Raycaster(), ndc = new T.Vector2();
+cv.addEventListener('pointerdown', e => { if (opening >= 0) return; ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); if (ray.intersectObject(book, true).length) open(); });
 if (running) loop();
 })();
 </script>
