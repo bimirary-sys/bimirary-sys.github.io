@@ -230,7 +230,7 @@ async function unlock() { const pw = $('pw').value; if (!pw) return; const b = $
     await enter();
   } finally { b.disabled = false; } }
 $('unlockBtn').onclick = unlock; $('pw').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
-$('setupBtn').onclick = async () => { const tok = $('tok').value.trim(), p1 = $('pw1').value, p2 = $('pw2').value, er = $('setupErr'); er.textContent = '';
+$('setupBtn').onclick = async () => { const tok = $('tok').value.replace(/[^A-Za-z0-9_]/g, ''), p1 = $('pw1').value, p2 = $('pw2').value, er = $('setupErr'); er.textContent = '';
   if (!/^(github_pat_|ghp_)/.test(tok)) { er.textContent = 'github_pat_ 로 시작하는 열쇠를 붙여 넣어 주세요.'; return; }
   if (p1.length < 10 || !/[a-zA-Z]/.test(p1) || !/[0-9]/.test(p1)) { er.textContent = '비밀번호는 영문과 숫자를 섞어 10자 이상으로 해 주세요.'; return; }
   if (p1 !== p2) { er.textContent = '두 비밀번호가 서로 달라요.'; return; }
