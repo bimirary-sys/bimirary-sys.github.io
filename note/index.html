@@ -37,16 +37,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--mint2);color:var
 .disc .track{display:flex;width:max-content;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden}
 .disc .track span{flex:none;padding-right:48px}
 .paper{max-width:560px;margin:0 auto;min-height:calc(100% - 62px);background:
- linear-gradient(90deg,transparent 46px,#ffc2b8 46px,#ffc2b8 48px,transparent 48px),
  repeating-linear-gradient(transparent 0 35px,var(--line) 35px 36px),var(--cream);
- padding:16px 16px calc(env(safe-area-inset-bottom) + 36px) 62px;position:relative;box-shadow:inset 10px 0 24px -14px rgba(200,170,60,.35),0 0 40px rgba(60,90,80,.12)}
-.paper:before{content:"";position:absolute;left:14px;top:20px;bottom:20px;width:18px;background:radial-gradient(circle at 9px 9px,var(--lemon) 6px,#e8d27a 6.5px,#e8d27a 7.5px,transparent 8px) 0 0/18px 54px repeat-y}
+ padding:16px 18px calc(env(safe-area-inset-bottom) + 36px);position:relative;box-shadow:0 0 40px rgba(60,90,80,.12)}
 /* top bar outside the notebook page (like the toy box's "상자 밖으로") */
 .topbar{max-width:560px;margin:0 auto;padding:12px 14px 10px}
 .out{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;background:rgba(255,255,255,.78);color:var(--ink);font:15px Jua,sans-serif;padding:9px 14px;border-radius:999px;box-shadow:0 2px 8px rgba(170,140,60,.18)}
 .out:active{transform:translateY(2px);box-shadow:none}
-h1{font-family:Jua,sans-serif;font-weight:400;font-size:28px;margin:10px 0 4px -46px;color:#e0705f;text-align:center}
-.sub{color:var(--sub);font-size:14px;margin:0 0 20px -46px;text-align:center}
+h1{font-family:Jua,sans-serif;font-weight:400;font-size:28px;margin:10px 0 4px;color:#e0705f;text-align:center}
+.sub{color:var(--sub);font-size:14px;margin:0 0 20px;text-align:center}
 #list,.foot{max-width:480px;margin-left:auto;margin-right:auto}
 .sec{margin:24px 0 10px;font:400 18px/1.4 Jua,sans-serif;color:var(--ink)}
 .sec span{background:linear-gradient(transparent 55%,var(--mint) 55%);padding:0 2px}
