@@ -36,20 +36,21 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--mint2);color:var
 .disc{flex:none;position:relative;z-index:3;height:26px;overflow:hidden;background:#fff3c4;border-bottom:1px solid #f1dfa0;color:#7a6440;font-size:11px;line-height:26px;letter-spacing:-.01em;white-space:nowrap;contain:paint}
 .disc .track{display:flex;width:max-content;will-change:transform;transform:translate3d(0,0,0);backface-visibility:hidden}
 .disc .track span{flex:none;padding-right:48px}
-.paper{max-width:560px;margin:0 auto;min-height:100%;background:
+.paper{max-width:560px;margin:0 auto;min-height:calc(100% - 62px);background:
  linear-gradient(90deg,transparent 46px,#ffc2b8 46px,#ffc2b8 48px,transparent 48px),
  repeating-linear-gradient(transparent 0 35px,var(--line) 35px 36px),var(--cream);
  padding:16px 16px calc(env(safe-area-inset-bottom) + 36px) 62px;position:relative;box-shadow:inset 10px 0 24px -14px rgba(200,170,60,.35),0 0 40px rgba(60,90,80,.12)}
 .paper:before{content:"";position:absolute;left:14px;top:20px;bottom:20px;width:18px;background:radial-gradient(circle at 9px 9px,var(--lemon) 6px,#e8d27a 6.5px,#e8d27a 7.5px,transparent 8px) 0 0/18px 54px repeat-y}
-.out{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--redSoft);cursor:pointer;background:#fff;color:var(--red);font:15px Jua,sans-serif;padding:8px 14px;border-radius:999px;box-shadow:0 2px 0 rgba(236,141,134,.25)}
+/* top bar outside the notebook page (like the toy box's "상자 밖으로") */
+.topbar{max-width:560px;margin:0 auto;padding:12px 14px 10px}
+.out{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;background:rgba(255,255,255,.78);color:var(--ink);font:15px Jua,sans-serif;padding:9px 14px;border-radius:999px;box-shadow:0 2px 8px rgba(170,140,60,.18)}
 .out:active{transform:translateY(2px);box-shadow:none}
-h1{font-family:Jua,sans-serif;font-weight:400;font-size:30px;margin:18px 0 2px;color:#e0705f}
-.sub{color:var(--sub);font-size:14px;margin:0 0 18px}
-.ep{margin:22px 0 6px}
-.ep h2{font-family:Jua,sans-serif;font-weight:400;font-size:19px;margin:0 0 8px;display:inline-block;background:linear-gradient(transparent 55%,var(--mint) 55%)}
-.memo{font-size:15px;line-height:1.7;margin:0 0 6px;padding:10px 12px;border-radius:12px;background:#fffdf6;border:1.5px dashed #f0c9b8}
-.memo mark{background:linear-gradient(transparent 50%,#fff08a 50%);color:inherit}
-.src{font-size:12px;color:var(--sub);margin:4px 2px 8px}
+h1{font-family:Jua,sans-serif;font-weight:400;font-size:28px;margin:10px 0 4px;color:#e0705f;text-align:center}
+.sub{color:var(--sub);font-size:14px;margin:0 0 20px;text-align:center}
+#list,.foot{max-width:480px;margin-left:auto;margin-right:auto}
+.sec{margin:24px 0 10px;font:400 18px/1.4 Jua,sans-serif;color:var(--ink)}
+.sec span{background:linear-gradient(transparent 55%,var(--mint) 55%);padding:0 2px}
+.sec:first-child{margin-top:4px}
 .links{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .links a{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:18px;border:2px solid #f3df8f;background:#fffbe8;color:var(--ink);text-decoration:none;
   box-shadow:0 4px 0 rgba(236,141,134,.22),0 8px 16px rgba(160,130,60,.08);scroll-margin-top:70px;
@@ -57,6 +58,9 @@ h1{font-family:Jua,sans-serif;font-weight:400;font-size:30px;margin:18px 0 2px;c
 .links li.show a{opacity:1;transform:none}
 .links a:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(236,141,134,.22)}
 .links a:target,.links li:target a{outline:3px solid #ffb3a7}
+.th{flex:none;position:relative;width:52px;height:52px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1.5px #f1e3ad}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th i{position:absolute;left:3px;top:3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--mint);color:var(--mintInk);font:normal 12px/18px Jua,sans-serif;text-align:center}
 .no{flex:none;width:32px;height:32px;border-radius:50%;background:var(--mint);color:var(--mintInk);font:17px/32px Jua,sans-serif;text-align:center}
 .nm{flex:1;min-width:0;font:18px/1.25 Jua,sans-serif}
 .nm small{display:block;margin-top:3px;font:13px "Gowun Dodum",sans-serif;color:var(--sub)}
@@ -86,8 +90,8 @@ h1{font-family:Jua,sans-serif;font-weight:400;font-size:30px;margin:18px 0 2px;c
 <section id="note" aria-label="복복이의 건강수첩" aria-hidden="true">
   <div class="disc" role="note" aria-label="이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."><div class="track" aria-hidden="true"><span>이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span></div></div>
   <div id="scroll">
+  <div class="topbar"><button class="out" id="closeBtn" type="button">← 수첩 덮기</button></div>
   <div class="paper">
-    <button class="out" id="closeBtn" type="button">← 수첩 덮기</button>
     <h1>복복이의 건강수첩</h1>
     <p class="sub">건강 고민별, 복복이의 생활 꿀팁을 쏙쏙</p>
     <div id="list"></div>
@@ -101,39 +105,35 @@ h1{font-family:Jua,sans-serif;font-weight:400;font-size:30px;margin:18px 0 2px;c
 </div>
 <aside class="pc" aria-label="휴대폰으로 열기"><div class="qr"><svg role="img" aria-label="건강수첩 QR코드" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37" shape-rendering="crispEdges"><rect width="37" height="37" fill="#fff"/><path fill="#3d7a63" d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM13 5h1v1h-1zM16 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM13 6h1v1h-1zM14 6h1v1h-1zM15 6h1v1h-1zM17 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM16 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM22 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM19 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM20 9h1v1h-1zM23 9h1v1h-1zM24 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM21 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM8 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM21 12h1v1h-1zM24 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM32 12h1v1h-1zM5 13h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM14 13h1v1h-1zM15 13h1v1h-1zM16 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM22 13h1v1h-1zM24 13h1v1h-1zM25 13h1v1h-1zM26 13h1v1h-1zM27 13h1v1h-1zM28 13h1v1h-1zM29 13h1v1h-1zM30 13h1v1h-1zM31 13h1v1h-1zM32 13h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM7 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM32 14h1v1h-1zM5 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM27 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM32 15h1v1h-1zM5 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM15 16h1v1h-1zM17 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM31 16h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM8 17h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM18 17h1v1h-1zM19 17h1v1h-1zM20 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM29 17h1v1h-1zM30 17h1v1h-1zM31 17h1v1h-1zM32 17h1v1h-1zM6 18h1v1h-1zM8 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM19 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM25 18h1v1h-1zM26 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM32 18h1v1h-1zM4 19h1v1h-1zM6 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM13 19h1v1h-1zM18 19h1v1h-1zM21 19h1v1h-1zM22 19h1v1h-1zM26 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM32 19h1v1h-1zM4 20h1v1h-1zM7 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM14 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM18 20h1v1h-1zM19 20h1v1h-1zM21 20h1v1h-1zM25 20h1v1h-1zM31 20h1v1h-1zM4 21h1v1h-1zM6 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM19 21h1v1h-1zM20 21h1v1h-1zM22 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM29 21h1v1h-1zM31 21h1v1h-1zM32 21h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM30 22h1v1h-1zM32 22h1v1h-1zM6 23h1v1h-1zM9 23h1v1h-1zM11 23h1v1h-1zM13 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM21 23h1v1h-1zM23 23h1v1h-1zM25 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM32 23h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM7 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM19 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM29 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM20 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM14 26h1v1h-1zM15 26h1v1h-1zM16 26h1v1h-1zM19 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM32 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM14 27h1v1h-1zM18 27h1v1h-1zM21 27h1v1h-1zM23 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM31 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM15 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM21 28h1v1h-1zM23 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM29 28h1v1h-1zM31 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM14 29h1v1h-1zM16 29h1v1h-1zM19 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM24 29h1v1h-1zM25 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM16 30h1v1h-1zM17 30h1v1h-1zM18 30h1v1h-1zM19 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM24 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM32 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM21 31h1v1h-1zM22 31h1v1h-1zM24 31h1v1h-1zM25 31h1v1h-1zM27 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM32 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM14 32h1v1h-1zM16 32h1v1h-1zM17 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM24 32h1v1h-1zM25 32h1v1h-1zM28 32h1v1h-1zM29 32h1v1h-1zM31 32h1v1h-1z"/></svg></div>휴대폰으로 보면<br>더 귀여워요 📱<small>카메라로 QR을 비춰 주세요</small></aside>
 
-<script>
-/* ================= 링크는 여기서만 바꾸면 돼요 =================
-   NOTES : 화별 쿠팡 링크 — { ep: '건강툰 1화', title: '주제', memo: '메모(<mark>강조</mark> 가능)', src: '출처',
-                               items: [ { no: 1, name: '제품명', desc: '한 줄 설명', url: '쿠팡 파트너스 링크' } ] }
-           → 영상 설명란에 …/note/#1 처럼 번호를 붙이면 그 칸으로 바로 열려요.
-   LINKS : 맨 아래 '더 둘러보기' 버튼들 — { name, desc, url }                                   */
-const NOTES = [
-];
-const LINKS = [
-  { name: '복복이 장난감 상자', desc: '복복이의 다른 놀잇감 모음', url: 'https://bimirary-sys.github.io/' },
-];
-/* ============================================================== */
-</script>
+<!-- 링크는 관리 페이지(/note/admin/)에서 바꿔요. 목록은 note/links.json 에 저장돼요. -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
 (() => {
 const $ = id => document.getElementById(id);
 const I = $('intro'), N = $('note'), SC = $('scroll'), APP = $('app'), flash = $('flash'), btn = $('openBtn'), list = $('list');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const linkRow = (it, ext) => '<li' + (it.no != null ? ' id="' + esc(it.no) + '"' : '') + '><a href="' + esc(it.url) + '"' + (ext ? ' target="_blank" rel="sponsored noopener"' : '') + '>' +
-  '<span class="no">' + (it.no != null ? esc(it.no) : '✦') + '</span><span class="nm">' + esc(it.name) + (it.desc ? '<small>' + esc(it.desc) + '</small>' : '') + '</span><span class="arr" aria-hidden="true">→</span></a></li>';
-function buildList() {
-  let h = NOTES.length ? NOTES.map(n => '<section class="ep"><h2>' + esc(n.ep) + (n.title ? ' · ' + esc(n.title) : '') + '</h2>' + (n.memo ? '<div class="memo">📝 ' + n.memo + '</div>' : '') + (n.src ? '<div class="src">출처: ' + esc(n.src) + '</div>' : '') +
-    '<ul class="links">' + (n.items || []).map(it => linkRow(it, true)).join('') + '</ul></section>').join('')
-    : '<div class="empty"><b>첫 번째 수첩이 곧 열려요 📒</b>영상에 나온 제품이 여기에 차곡차곡 모일 거예요.</div>';
-  if (LINKS.length) h += '<p class="more">더 둘러보기</p><ul class="links">' + LINKS.map(it => linkRow(it, false)).join('') + '</ul>';
+const PREVIEW = new URLSearchParams(location.search).has('preview');
+const FALLBACK = { blocks: [ { id: 't1', type: 'text', text: '더 둘러보기', on: true }, { id: 'l1', type: 'link', title: '복복이 장난감 상자', desc: '복복이의 다른 놀잇감 모음', url: 'https://bimirary-sys.github.io/', on: true } ] };
+const hasNo = b => b.no != null && String(b.no).trim() !== '';
+const isExt = u => /^https?:/i.test(u) && !u.includes(location.host);
+const linkRow = b => '<li' + (hasNo(b) ? ' id="' + esc(b.no) + '"' : '') + '><a href="' + esc(b.url) + '"' + (isExt(b.url) ? ' target="_blank" rel="sponsored noopener"' : '') + '>' +
+  (b.img ? '<span class="th"><img src="' + esc(b.img) + '" alt="" loading="lazy">' + (hasNo(b) ? '<i>' + esc(b.no) + '</i>' : '') + '</span>' : '<span class="no">' + (hasNo(b) ? esc(b.no) : '✦') + '</span>') +
+  '<span class="nm">' + esc(b.title) + (b.desc ? '<small>' + esc(b.desc) + '</small>' : '') + '</span><span class="arr" aria-hidden="true">→</span></a></li>';
+function buildList(data) {
+  const bl = ((data && data.blocks) || []).filter(b => b && b.on !== false);
+  let h = bl.some(b => b.type === 'link' && hasNo(b)) ? '' : '<div class="empty"><b>첫 번째 수첩이 곧 열려요 📒</b>영상에 나온 제품이 여기에 차곡차곡 모일 거예요.</div>', open = false;
+  for (const b of bl) {
+    if (b.type === 'text' && b.text) { if (open) { h += '</ul>'; open = false; } h += '<h2 class="sec"><span>' + esc(b.text) + '</span></h2>'; }
+    else if (b.type === 'link' && b.url && b.title) { if (!open) { h += '<ul class="links">'; open = true; } h += linkRow(b); } }
+  if (open) h += '</ul>';
   list.innerHTML = h; }
-buildList();
+const dataReady = PREVIEW ? new Promise(res => { addEventListener('message', function on(e) { if (e.origin !== location.origin || !e.data || e.data.type !== 'bokbok-preview') return; buildList(e.data.data); revealLinks(true); res(); }); parent.postMessage({ type: 'bokbok-preview-ready' }, location.origin); })
+  : fetch('links.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject()).catch(() => FALLBACK).then(d => buildList(d));
 const rows = () => [...list.querySelectorAll('.links li')];
 function revealLinks(instant) { rows().forEach((li, i) => instant ? li.classList.add('show') : setTimeout(() => li.classList.add('show'), 60 + i * 70)); }
 function hideLinks() { rows().forEach(li => li.classList.remove('show')); }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const hash = decodeURIComponent(location.hash.slice(1)), direct = !!hash;
+const hash = decodeURIComponent(location.hash.slice(1)), direct = !!hash || PREVIEW;
 let seen = false; try { seen = localStorage.getItem('bokbok_note_seen') === '1'; } catch (e) {}
 let state = 'idle';
 /* ---------- commission notice marquee: measured, constant speed, runs only while the page is open ---------- */
@@ -151,9 +151,10 @@ for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) disc.addEventLi
 let mT; addEventListener('resize', () => { clearTimeout(mT); mT = setTimeout(() => { buildMarquee(); if (state === 'inside') playMarquee(); }, 150); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { buildMarquee(); if (state === 'inside') playMarquee(); });
 function showList(instant) { state = 'inside'; btn.classList.add('hide'); N.style.transition = 'none'; N.classList.add('show'); N.setAttribute('aria-hidden', 'false'); void N.offsetWidth; N.style.transition = ''; I.classList.add('gone');
-  SC.scrollTop = 0; revealLinks(instant); playMarquee(true);
-  if (hash && hash !== '목록' && hash !== 'list') { const el = document.getElementById(hash); if (el) setTimeout(() => el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'center' }), 120); }
-  seen = true; try { localStorage.setItem('bokbok_note_seen', '1'); } catch (e) {} }
+  SC.scrollTop = 0; playMarquee(true);
+  dataReady.then(() => { revealLinks(instant);
+    if (hash && hash !== '목록' && hash !== 'list') { const el = document.getElementById(hash); if (el) setTimeout(() => el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'center' }), 120); } });
+  if (!PREVIEW) { seen = true; try { localStorage.setItem('bokbok_note_seen', '1'); } catch (e) {} } }
 function fadeSwap(mid, done) { flash.style.transition = 'opacity .16s'; flash.style.opacity = 1; setTimeout(() => { mid(); flash.style.opacity = 0; setTimeout(() => { flash.style.transition = ''; done && done(); }, 170); }, 170); }
 if (direct || !window.THREE) { showList(true); if (!window.THREE) { $('closeBtn').style.display = 'none'; return; } }
 /* ---------- sounds (very quiet) ---------- */
