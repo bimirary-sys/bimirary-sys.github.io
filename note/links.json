@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "blocks": [
+    { "id": "t1", "type": "text", "text": "더 둘러보기", "on": true },
+    { "id": "l1", "type": "link", "title": "복복이 장난감 상자", "desc": "복복이의 다른 놀잇감 모음", "url": "https://bimirary-sys.github.io/", "on": true }
+  ],
+  "archive": []
+}
