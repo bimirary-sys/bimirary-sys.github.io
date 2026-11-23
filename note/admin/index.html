@@ -198,7 +198,7 @@ async function unlockToken(box, pw) { const key = await deriveKey(pw, unb64(box.
 /* ---------- GitHub API ---------- */
 let TOKEN = null;
 async function gh(path, opt = {}) {
-  const r = await fetch(path.startsWith('http') ? path : API + path, Object.assign({}, opt, { headers: Object.assign({ Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}, opt.body ? { 'Content-Type': 'application/json' } : {}) }));
+  const r = await fetch(path.startsWith('http') ? path : API + path, Object.assign({ cache: 'no-store' }, opt, { headers: Object.assign({ Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}, opt.body ? { 'Content-Type': 'application/json' } : {}) }));
   if (!r.ok) { const e = new Error('GitHub ' + r.status); e.status = r.status; try { e.detail = (await r.json()).message; } catch (x) {} throw e; }
   return r.status === 204 ? null : r.json(); }
 const b64utf8 = s => b64(enc.encode(s));
@@ -210,8 +210,8 @@ async function readKeyBox() { // public read, no token needed
   return null; }
 async function checkToken() { const repo = await gh(''); if (!repo.permissions || !repo.permissions.push) throw Object.assign(new Error('no-push'), { status: 403 }); }
 // one commit for any number of files: [{ path, text } | { path, blob }]
-async function commitFiles(files, message) {
-  const ref = await gh('/git/ref/heads/' + BRANCH), base = ref.object.sha, baseCommit = await gh('/git/commits/' + base);
+async function commitFiles(files, message, tries = 3) {
+  const ref = await gh('/git/ref/heads/' + BRANCH + '?t=' + Date.now()), base = ref.object.sha, baseCommit = await gh('/git/commits/' + base);
   const tree = [];
   for (const f of files) {
     const content = f.blob ? b64(await f.blob.arrayBuffer()) : b64utf8(f.text);
@@ -219,7 +219,8 @@ async function commitFiles(files, message) {
     tree.push({ path: f.path, mode: '100644', type: 'blob', sha: bl.sha }); }
   const nt = await gh('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: baseCommit.tree.sha, tree }) });
   const nc = await gh('/git/commits', { method: 'POST', body: JSON.stringify({ message, tree: nt.sha, parents: [base] }) });
-  await gh('/git/refs/heads/' + BRANCH, { method: 'PATCH', body: JSON.stringify({ sha: nc.sha }) }); }
+  try { await gh('/git/refs/heads/' + BRANCH, { method: 'PATCH', body: JSON.stringify({ sha: nc.sha }) }); }
+  catch (e) { if (e.status === 422 && tries > 1) { await new Promise(r => setTimeout(r, 1500)); return commitFiles(files, message, tries - 1); } throw e; } }
 
 /* ---------- lock / setup ---------- */
 let KEYBOX = null;
